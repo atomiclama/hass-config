@@ -1,0 +1,161 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 53.067165
+  longitude: -2.103514
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 190
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/London
+  # Customization file
+  customize: !include customize.yaml
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+  ignore:
+  - axis  # this is manually configured as it is an old device.
+  
+  
+# Allows you to issue voice commands from the frontend in enabled browsers
+#conversation:
+
+# Enables support for tracking state changes over time
+history:
+
+
+# View all events in a logbook
+#logbook:
+
+# Enables a map showing the location of tracked devices
+#map:
+
+# Track the sun
+sun:
+
+# Sensors
+sensor:
+  # Weather prediction
+#  - platform: yr
+
+# Random number sensor just to prove stuff works, remove at a later date.
+  - platform: random
+  
+# Group of sensors attached to ESP water tank device.
+  - platform: mqtt
+    name: "water-1"
+    state_topic: "tele/test1/SENSOR"
+    value_template: '{{ value_json["DS18B20-2"]["Temperature"] }}'
+    unit_of_measurement: "°C"
+  - platform: mqtt
+    name: "water-2"
+    state_topic: "tele/test1/SENSOR"
+    value_template: '{{ value_json["DS18S20-1"]["Temperature"] }}'
+    unit_of_measurement: "°C"
+
+# More sensors 
+
+binary_sensor:
+  - platform: workday
+    country: UK
+
+# Switches
+switch:
+  - platform: mqtt
+    name: "Sonoff power"
+    state_topic: "stat/test1/POWER"
+#    value_template: "{{ value_json.POWER }}"
+    command_topic: "cmnd/test1/POWER"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+
+# Text to speech
+tts:
+  - platform: google
+
+# Cloud
+#cloud:
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+
+mqtt:
+  broker: 192.168.2.1
+#  discovery: true
+#  discovery_prefix: hass
+#  password: hass
+
+camera:
+  - platform: mjpeg
+    name: Hallway
+    mjpeg_url: http://192.168.1.11/axis-cgi/mjpg/video.cgi?resolution=640x480
+    username: hass
+    password: !secret camera_password
+
+recorder:
+  db_url: postgres://@/homeassistant
+  
+  
+weather:
+  - platform: darksky
+    api_key: !secret darksky_key
+  - platform: metoffice
+    api_key: !secret metoffice_key
+    
+    
+media_player:
+  - platform: volumio
+    name: kitchen_media
+    host: kitchen.connect
+    
+#  - platform: mpd
+#    name: volumio_mpd
+#    host: 1.2.3.4
+        
+climate:
+  - platform: generic_thermostat
+    name: water
+    heater: switch.Sonoff_power
+    target_sensor: sensor.water_1
+    min_temp: 15
+    max_temp: 80
+    ac_mode: false
+    target_temp: 17
+    cold_tolerance: 20
+    hot_tolerance: 0
+    min_cycle_duration:
+      seconds: 1
+    keep_alive:
+      minutes: 3
+    initial_operation_mode: "auto"
+    away_temp: 16
+    precision: 1   
+      
+  
+  

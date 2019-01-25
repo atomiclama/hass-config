@@ -1,0 +1,34 @@
+- alias: 'schedule workday hw on'
+  trigger:
+    - platform: time
+      at: '09:27:00'
+    - platform: time
+      at: '09:29:00'
+    - platform: time
+      at: '09:31:00'
+  condition:
+    condition: state
+    entity_id: 'binary_sensor.workday_sensor'
+    state: 'on'
+  action: 
+    service: climate.turn_on
+    
+- alias: 'schedule workday hw off'  
+  trigger:
+    - platform: time
+      at: '09:29:00'
+    - platform: time
+      at: '09:30:00'
+    - platform: time
+      at: '09:32:00'
+  condition:
+    condition: state
+    entity_id: 'binary_sensor.workday_sensor'
+    state: 'on'      
+  action: 
+    service: climate.turn_off
+    
+   
+     
+  
+  

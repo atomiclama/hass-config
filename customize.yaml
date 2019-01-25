@@ -1,0 +1,3 @@
+sensor.random_sensor:
+  maximum: 30
+switch.sonoff_power: {}
